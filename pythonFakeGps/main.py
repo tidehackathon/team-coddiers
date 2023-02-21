@@ -1,8 +1,9 @@
 import cv2
-import time
 
 from compareImages import compare_images
 import matplotlib.pyplot as plt
+
+from pythonFakeGps.rescaleFrame import rescale_frame
 
 vic_cap = cv2.VideoCapture('rec\sample2a-gimbal.MOV')
 last_image = None
@@ -17,6 +18,11 @@ y_points = []
 z_points = []
 
 plt.ion()
+fg = plt.figure()
+ax = fg.gca()
+h = None
+fg.show()
+
 fg2 = plt.figure()
 ax2 = fg2.add_subplot(projection='3d')
 ax2.set_xlim(-10, 10)
@@ -30,17 +36,24 @@ fg2.show()
 
 success, image = vic_cap.read()
 while success:
-    start = time.time()
     success, image = vic_cap.read()
+    image = rescale_frame(image, percent=50)
     if last_image is not None:
-        x_difference, y_difference = compare_images(last_image, image, True)
+        compared_images, x_difference, y_difference = compare_images(last_image, image, True)
         current_x = current_x + x_difference
         current_y = current_y + y_difference
         x_points.append(current_x)
         y_points.append(current_y)
         z_points.append(current_z)
         h2._offsets3d = (x_points, y_points, z_points)
+        if first_step:
+            h = ax.imshow(compared_images)
+            first_step = False
+        else:
+            h.set_data(compared_images)
         plt.draw(), plt.pause(0.05)
     last_image = image
     count += 1
-    print(time.time() - start)
+
+vic_cap.release()
+cv2.destroyAllWindows()
