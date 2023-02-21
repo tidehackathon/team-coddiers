@@ -35,13 +35,15 @@ h2 = ax2.scatter(x_points, y_points, z_points)
 fg2.show()
 
 success, image = vic_cap.read()
+center_width = int(image.shape[1] / 2)
+center_height = int(image.shape[0] / 2)
+center_point = (center_width, center_height)
 while success:
     success, image = vic_cap.read()
     image = rescale_frame(image, percent=50)
     if last_image is not None:
-        compared_images, x_difference, y_difference = compare_images(last_image, image, True)
-        current_x = current_x + x_difference
-        current_y = current_y + y_difference
+        compared_images, dist_difference = compare_images(last_image, image, True, center_point)
+        current_x = current_x + dist_difference
         x_points.append(current_x)
         y_points.append(current_y)
         z_points.append(current_z)

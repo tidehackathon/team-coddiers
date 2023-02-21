@@ -1,3 +1,5 @@
+import math
+
 import cv2 as cv
 import concurrent.futures
 
@@ -19,7 +21,7 @@ def get_distance(item):
     return item.distance
 
 
-def compare_images(first_img, second_img, mono):
+def compare_images(first_img, second_img, mono, center_point):
     if mono:
         first_img = cv.cvtColor(first_img, cv.COLOR_BGR2GRAY)
         second_img = cv.cvtColor(second_img, cv.COLOR_BGR2GRAY)
@@ -47,23 +49,26 @@ def compare_images(first_img, second_img, mono):
     best_key_points_1 = [key_points_1[m.queryIdx] for m in good_matches][:accuracy]
     best_key_points_2 = [key_points_2[m.trainIdx] for m in good_matches][:accuracy]
 
-    x_difference = 0
-    y_difference = 0
+    dist_difference = 0
     if len(best_key_points_1) > accuracy and len(best_key_points_2) > accuracy:
         for i in range(accuracy):
-            x_difference += best_key_points_1[i].pt[0] - best_key_points_2[i].pt[0]
-            y_difference += best_key_points_2[i].pt[1] - best_key_points_1[i].pt[1]
+            dist_one = math.dist(center_point, best_key_points_1[i].pt)
+            dist_two = math.dist(center_point, best_key_points_2[i].pt)
+            dist_difference += math.fabs(dist_one - dist_two)
     else:
         if len(best_key_points_1) > len(best_key_points_2):
             for i in range(len(best_key_points_2)):
-                x_difference += best_key_points_1[i].pt[0] - best_key_points_2[i].pt[0]
-                y_difference += best_key_points_2[i].pt[1] - best_key_points_1[i].pt[1]
+                dist_one = math.dist(center_point, best_key_points_1[i].pt)
+                dist_two = math.dist(center_point, best_key_points_2[i].pt)
+                dist_difference += dist_one - dist_two
         else:
             for i in range(len(best_key_points_1)):
-                x_difference += best_key_points_1[i].pt[0] - best_key_points_2[i].pt[0]
-                y_difference += best_key_points_2[i].pt[1] - best_key_points_1[i].pt[1]
+                dist_one = math.dist(center_point, best_key_points_1[i].pt)
+                dist_two = math.dist(center_point, best_key_points_2[i].pt)
+                dist_difference += dist_one - dist_two
 
-    x_difference = x_difference / (accuracy * 100)
-    y_difference = y_difference / (accuracy * 100)
+    dist_difference = dist_difference / (accuracy * 100)
 
-    return compared_images, x_difference, y_difference
+    print(dist_difference)
+
+    return compared_images, dist_difference
