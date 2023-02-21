@@ -3,7 +3,7 @@ import cv2
 from compareImages import compare_images
 import matplotlib.pyplot as plt
 
-from pythonFakeGps.rescaleFrame import rescale_frame
+from emNav.rescaleFrame import rescale_frame
 
 vic_cap = cv2.VideoCapture('rec\sample2a-gimbal.MOV')
 last_image = None
