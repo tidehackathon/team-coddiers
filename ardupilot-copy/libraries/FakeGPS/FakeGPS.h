@@ -1,27 +1,36 @@
 #pragma once
 
+#include "MySocketExample.h"
+
 class FakeGPS
 {
 public:
     FakeGPS();
 
     // get singleton instance
-    static FakeGPS *get_singleton() { return _singleton; }
+    static FakeGPS *get_singleton()
+    {
+        return _singleton;
+    }
 
     // external position backend types (used by _TYPE parameter)
-    enum FakeGPSLocation {
-        FakeGPSLocation_None   = 0,
-        FakeGPSLocation_Pozyx  = 1,
-        FakeGPSLocation_Marvelmind = 2,
-        FakeGPSLocation_Nooploop  = 3,
-        FakeGPSLocation_SITL   = 10
+    struct FakeGPSLocation {
+        double longitude;
+        double latitude;
+        float altitude;
+        double speedD;
+        double speedN;
+        double speedE;
+
     };
 
     // update state of all beacons
-    void update(void);
+    void update();
 
+    FakeGPSLocation data = FakeGPSLocation();
 
 private:
+    MySocketExample sock = MySocketExample(true);
 
     static FakeGPS *_singleton;
 
@@ -30,8 +39,9 @@ private:
 
 };
 
-namespace AP {
-    FakeGPS *fake_gps();
+namespace AP
+{
+FakeGPS *fake_gps();
 };
 
 

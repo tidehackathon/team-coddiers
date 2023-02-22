@@ -1029,7 +1029,9 @@ private:
     void update_fbwb_speed_height(void);
     void setup_turn_angle(void);
     bool reached_loiter_target(void);
+#if AP_FAKE_GPS_ENABLED
     void read_gps();
+#endif //AP_FAKE_GPS_ENABLED
 
     // radio.cpp
     void set_control_channels(void) override;

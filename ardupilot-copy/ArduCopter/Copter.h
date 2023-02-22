@@ -70,6 +70,7 @@
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 #include <AP_OpticalFlow/AP_OpticalFlow.h>
+#include <FakeGPS/FakeGPS.h>
 
 // Configuration
 #include "defines.h"
@@ -676,6 +677,9 @@ private:
     bool has_ekf_failsafed() const override;
 #endif // AP_SCRIPTING_ENABLED
     void rc_loop();
+#if AP_FAKE_GPS_ENABLED
+    void read_gps();
+#endif //AP_FAKE_GPS_ENABLED
     void throttle_loop();
     void update_batt_compass(void);
     void loop_rate_logging();

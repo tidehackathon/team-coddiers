@@ -138,10 +138,12 @@ float Plane::mode_auto_target_airspeed_cm()
     return aparm.airspeed_cruise_cm;
 }
 
+#if AP_FAKE_GPS_ENABLED
 void Plane::read_gps() {
     FakeGPS *fakeGps = AP::fake_gps();
     fakeGps->update();
 }
+#endif //AP_FAKE_GPS_ENABLED
 
 void Plane::calc_airspeed_errors()
 {
