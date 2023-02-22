@@ -11,15 +11,17 @@ from rescaleFrame import rescale_frame
 from params import video_src, rescale_frame_percent
 
 
-def video_reader(drone_height, vehicle):
+def video_reader(vehicle):
     vic_cap = cv2.VideoCapture(video_src)
     first_step = True
     count = 0
     current_x = 0
     current_y = 0
+    gps_x_points = []
+    gps_y_points = []
+    z_points = []
     x_points = []
     y_points = []
-    z_points = []
 
     last_lat = None
     last_lon = None
@@ -46,7 +48,8 @@ def video_reader(drone_height, vehicle):
     ax2.set_xlabel('$X$')
     ax2.set_ylabel('$Y$')
     ax2.set_zlabel('$Z$')
-    h2 = ax2.scatter(x_points, y_points, z_points)
+    h2 = ax2.scatter(gps_x_points, gps_y_points, z_points, color='blue')
+    h3 = ax2.scatter(x_points, y_points, z_points, color='red')
     fg2.show()
 
     success, image = vic_cap.read()
@@ -61,12 +64,14 @@ def video_reader(drone_height, vehicle):
             compare_images(image, True, center_point, last_image,
                            key_points_1, descriptors_1, best_key_points_1)
         if compared_images is not None and dist_difference is not None and best_key_points_2 is not None:
-            if count < 100:
+            if count < 500:
                 print('Step: ', count)
                 current_x = get_lon(vehicle) % 10 * 10
                 current_y = get_lat(vehicle) % 10 * 10
                 current_z = get_alt(vehicle)
                 print('GPS: ', current_x, current_y, current_z)
+                gps_x_points.append(current_x)
+                gps_y_points.append(current_y)
                 x_points.append(current_x)
                 y_points.append(current_y)
                 z_points.append(current_z)
@@ -76,7 +81,7 @@ def video_reader(drone_height, vehicle):
                 last_lon = current_x
                 last_lat = current_y
             else:
-                if count == 100:
+                if count == 500:
                     factor = np.median(np.array(dist_lon_lat_tab)) / np.mean(np.array(dist_x_y_tab))
                     print(np.mean(np.array(dist_lon_lat_tab)))
                     print(np.mean(np.array(dist_x_y_tab[3:])))
@@ -94,14 +99,19 @@ def video_reader(drone_height, vehicle):
                 x_points.append(current_x)
                 y_points.append(current_y)
                 z_points.append(current_z)
+                current_x = get_lon(vehicle) % 10 * 10
+                current_y = get_lat(vehicle) % 10 * 10
+                gps_x_points.append(current_x)
+                gps_y_points.append(current_y)
 
-            h2._offsets3d = (x_points, y_points, z_points)
+            h2._offsets3d = (gps_x_points, gps_y_points, z_points)
+            h3._offsets3d = (x_points, y_points, z_points)
             if first_step:
                 h = ax.imshow(compared_images)
                 first_step = False
             else:
                 h.set_data(compared_images)
-        plt.draw(), plt.pause(0.5)
+        plt.draw(), plt.pause(0.05)
         last_image = new_img
         key_points_1 = key_points_2
         descriptors_1 = descriptors_2
