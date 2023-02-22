@@ -40,6 +40,9 @@
 #if HAL_SIM_GPS_ENABLED
 #include "AP_GPS_SITL.h"
 #endif
+#if AP_FAKE_GPS_ENABLED
+#include "AP_GPS_FAKE.h"
+#endif
 
 #if HAL_ENABLE_LIBUAVCAN_DRIVERS
 #include <AP_CANManager/AP_CANManager.h>
@@ -590,6 +593,9 @@ void AP_GPS::send_blob_start(uint8_t instance)
     const char *blob = nullptr;
     uint32_t blob_size = 0;
     switch (_type[instance]) {
+#if AP_FAKE_GPS_ENABLED
+    case GPS_FAKE:
+#endif
 #if AP_GPS_SBF_ENABLED
     case GPS_TYPE_SBF:
 #endif //AP_GPS_SBF_ENABLED
@@ -756,6 +762,10 @@ AP_GPS_Backend *AP_GPS::_detect_instance(uint8_t instance)
     case GPS_TYPE_SITL:
         return new AP_GPS_SITL(*this, state[instance], _port[instance]);
 #endif  // HAL_SIM_GPS_ENABLED
+#if AP_FAKE_GPS_ENABLED
+    case GPS_FAKE:
+        return new AP_GPS_FAKE(*this, state[instance], _port[instance]);
+#endif
 
     default:
         break;
