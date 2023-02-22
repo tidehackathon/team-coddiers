@@ -1,1 +1,3 @@
-/pythonFakeGps/rec/
+/emNav/rec/
+.idea
+emNav/__pycache__/
