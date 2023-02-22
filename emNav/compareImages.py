@@ -32,7 +32,8 @@ def compare_images(new_img, mono, center_point, last_image, key_points_1, descri
         compared_images = cv.drawMatches(last_image, key_points_1, new_img, key_points_2, good_matches[:3], img_matches,
                                          flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
-        best_key_points_2 = [key_points_2[m.trainIdx] for m in good_matches][:dist_calc_accuracy]
+        best_key_points_2 = [key_points_2[m.trainIdx]
+                             for m in good_matches][:dist_calc_accuracy]
 
         if best_key_points_1 is not None:
             dist_difference = 0
@@ -44,16 +45,20 @@ def compare_images(new_img, mono, center_point, last_image, key_points_1, descri
             else:
                 if len(best_key_points_1) > len(best_key_points_2):
                     for i in range(len(best_key_points_2)):
-                        dist_one = math.dist(center_point, best_key_points_1[i].pt)
-                        dist_two = math.dist(center_point, best_key_points_2[i].pt)
+                        dist_one = math.dist(
+                            center_point, best_key_points_1[i].pt)
+                        dist_two = math.dist(
+                            center_point, best_key_points_2[i].pt)
                         dist_difference += dist_one - dist_two
                 else:
                     for i in range(len(best_key_points_1)):
-                        dist_one = math.dist(center_point, best_key_points_1[i].pt)
-                        dist_two = math.dist(center_point, best_key_points_2[i].pt)
+                        dist_one = math.dist(
+                            center_point, best_key_points_1[i].pt)
+                        dist_two = math.dist(
+                            center_point, best_key_points_2[i].pt)
                         dist_difference += dist_one - dist_two
 
-            dist_difference = dist_difference / (dist_calc_accuracy * 10)
+            dist_difference = dist_difference / dist_calc_accuracy
             return compared_images, dist_difference, new_img, key_points_2, descriptors_2, best_key_points_2
         else:
             return None, None, new_img, key_points_2, descriptors_2, best_key_points_2
