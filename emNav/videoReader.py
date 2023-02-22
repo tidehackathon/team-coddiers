@@ -1,5 +1,4 @@
 import math
-import time
 from math import pi, radians, cos, sin
 import cv2
 import numpy as np
@@ -7,7 +6,7 @@ import numpy as np
 from compareImages import compare_images
 import matplotlib.pyplot as plt
 
-from emNav.vehicleData import get_heading, get_alt, get_lat, get_lon
+from vehicleData import get_heading, get_alt, get_lat, get_lon
 from rescaleFrame import rescale_frame
 from params import video_src, rescale_frame_percent
 
@@ -57,8 +56,10 @@ def video_reader(drone_height, vehicle):
     while success:
         success, image = vic_cap.read()
         image = rescale_frame(image, percent=rescale_frame_percent)
+
         compared_images, dist_difference, new_img, key_points_2, descriptors_2, best_key_points_2 = \
-            compare_images(image, True, center_point, last_image, key_points_1, descriptors_1, best_key_points_1)
+            compare_images(image, True, center_point, last_image,
+                           key_points_1, descriptors_1, best_key_points_1)
         if compared_images is not None and dist_difference is not None and best_key_points_2 is not None:
             if count < 100:
                 print('Step: ', count)
@@ -74,12 +75,9 @@ def video_reader(drone_height, vehicle):
                     dist_x_y_tab.append(dist_difference)
                 last_lon = current_x
                 last_lat = current_y
-
             else:
                 if count == 100:
-                    factor = np.mean(np.array(dist_lon_lat_tab)) / np.mean(np.array(dist_x_y_tab))
-                    print(dist_lon_lat_tab)
-                    print(dist_x_y_tab[3:])
+                    factor = np.median(np.array(dist_lon_lat_tab)) / np.mean(np.array(dist_x_y_tab))
                     print(np.mean(np.array(dist_lon_lat_tab)))
                     print(np.mean(np.array(dist_x_y_tab[3:])))
                     print('Factor: ', factor)

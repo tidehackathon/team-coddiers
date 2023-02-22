@@ -1,4 +1,4 @@
-video_src = 'rec\sample2a-gimbal.MOV'
+video_src = 'rec/sample2a-gimbal.MOV'
 
 flann_index_kdtree = 1
 search_params_checks = 50
