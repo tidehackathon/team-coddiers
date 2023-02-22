@@ -1,3 +1,4 @@
 /emNav/rec/
 .idea
 emNav/__pycache__/
+connector/dronekit-python/
