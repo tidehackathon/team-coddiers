@@ -144,6 +144,9 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     FAST_TASK(Log_Video_Stabilisation),
 
     SCHED_TASK(rc_loop,              250,    130,  3),
+#if AP_FAKE_GPS_ENABLED
+    SCHED_TASK(read_gps,               10,    200,   6),
+#endif //AP_FAKE_GPS_ENABLED
     SCHED_TASK(throttle_loop,         50,     75,  6),
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
 #if AP_OPTICALFLOW_ENABLED
@@ -444,6 +447,12 @@ bool Copter::has_ekf_failsafed() const
 
 #endif // AP_SCRIPTING_ENABLED
 
+#if AP_FAKE_GPS_ENABLED
+void Copter::read_gps() {
+    FakeGPS *fakeGps = AP::fake_gps();
+    fakeGps->update();
+}
+#endif //AP_FAKE_GPS_ENABLED
 
 // rc_loops - reads user input from transmitter/receiver
 // called at 100hz

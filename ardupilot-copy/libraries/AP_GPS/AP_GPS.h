@@ -133,6 +133,9 @@ public:
 #if HAL_SIM_GPS_ENABLED
         GPS_TYPE_SITL = 100,
 #endif
+#if AP_FAKE_GPS_ENABLED
+        GPS_FAKE = 101,
+#endif
     };
 
     /// GPS status codes

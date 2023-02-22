@@ -14,18 +14,63 @@
  */
 
 #include "FakeGPS.h"
+#include <stdlib.h>
+#include "MySocketExample.h"
+#include <string>
+#include <iostream>
 
+#define ADDRESS "127.0.0.1"
+#define PORT 64209
 
 FakeGPS::FakeGPS()
 {
-    _singleton = this;
+    sock.set_blocking(false);
+    sock.reuseaddress();
 
+
+    // bind the socket
+    if (!sock.bind(ADDRESS, PORT)) {
+        std::cout << "[VisualNavigator] " << "failed to bind with "
+                  << ADDRESS << ":" << PORT << std::endl;
+    }
+    std::cout << "[VisualNavigator] " << "flight dynamics model at "
+              << ADDRESS << ":" << PORT << std::endl;
+
+    _singleton = this;
 }
 
 
 // update state. This should be called often from the main loop
-void FakeGPS::update(void)
+void FakeGPS::update()
 {
+        auto recvSize = sock.recv(&data, sizeof(FakeGPSLocation), 1 /*wait ms*/);
+
+
+        // drain the socket in the case we're backed up
+        int counter = 0;
+        while (true) {
+            FakeGPSLocation last_data;
+            auto recvSize_last = sock.recv(&last_data, sizeof(FakeGPSLocation), 0ul);
+            if (recvSize_last == -1) {
+            std::cout << "[FakeGPS] " << "Drained n packets: " << counter << std::endl;
+            }
+            counter++;
+            data = last_data;
+            recvSize = recvSize_last;
+        }
+        if (counter > 0) {
+            std::cout << "[FakeGPS] " << "Drained n packets: " << counter << std::endl;
+        }
+
+        // debug: inspect SITL packet
+        std::cout << "recv " << recvSize << " bytes from " << ADDRESS << ":" << PORT << "\n";
+        std::cout << "speedD: " << data.speedD << "\n";
+        std::cout << "speedE: " << data.speedE << "\n";
+        std::cout << "speedN: " << data.speedN << "\n";
+        std::cout << "longitude: " << data.longitude << "\n";
+        std::cout << "latitude: " << data.latitude << "\n";
+        std::cout << "altitude: " << data.altitude << "\n";
+
 
 }
 
@@ -33,7 +78,8 @@ void FakeGPS::update(void)
 // singleton instance
 FakeGPS *FakeGPS::_singleton;
 
-namespace AP {
+namespace AP
+{
 
 FakeGPS *fake_gps()
 {
@@ -41,111 +87,3 @@ FakeGPS *fake_gps()
 }
 
 }
-
-
-
-// #pragma once
-// #include <stdlib.h>
-// // #include "SocketExample2.cpp"
-// #include <string>
-// #include <iostream>
-
-
-// /**
-//  * The Singleton class defines the `GetInstance` method that serves as an
-//  * alternative to constructor and lets clients access the same instance of this
-//  * class over and over.
-//  */
-
-// struct servo_packet {
-//     double longitude;
-//     double latitude;
-//     float altitude;
-//     double speedD;
-//     double speedN;
-//     double speedE;
-// };
-
-// class VisualNavigator
-// {
-
-// protected:
-
-//     static VisualNavigator* visualNavigator_;
-//     int connectionTimeoutCount;
-//     int connectionTimeoutMaxCount = 10;
-//     SocketExample2 sock = SocketExample2(true);
-//     VisualNavigator()
-//     {
-//         sock.set_blocking(false);
-//         sock.reuseaddress();
-
-
-//         // bind the socket
-//         if (!sock.bind("127.0.0.1", 42069)) {
-//             std::cout << "[VisualNavigator] " << "failed to bind with "
-//                       << "127.0.0.1" << ":" << 42069 << std::endl;
-//         }
-//         std::cout << "[VisualNavigator] " << "flight dynamics model at "
-//                   << "127.0.0.1" << ":" << 42069 << std::endl;
-//     }
-
-// public:
-//     servo_packet pkt = servo_packet();
-
-
-//     VisualNavigator(VisualNavigator &other) = delete;
-//     void operator=(const VisualNavigator &) = delete;
-//     static VisualNavigator *get_singleton();
-
-//     void updatePosition()
-//     {
-//         auto recvSize = sock.recv(&pkt, sizeof(servo_packet), 1 /*wait ms*/);
-
-
-//         // drain the socket in the case we're backed up
-//         int counter = 0;
-//         while (true) {
-//             servo_packet last_pkt;
-//             auto recvSize_last = sock.recv(&last_pkt, sizeof(servo_packet), 0ul);
-//             if (recvSize_last == -1) {
-//                 break;
-//             }
-//             counter++;
-//             pkt = last_pkt;
-//             recvSize = recvSize_last;
-//         }
-//         if (counter > 0) {
-//             std::cout << "[VisualNavigator] " << "Drained n packets: " << counter << std::endl;
-//         }
-
-
-//         // debug: inspect SITL packet
-//         std::cout << "recv " << recvSize << " bytes from " << "127.0.0.1" << ":" << 42069 << "\n";
-//         std::cout << "speedD: " << pkt.speedD << "\n";
-//         std::cout << "speedE: " << pkt.speedE << "\n";
-//         std::cout << "speedN: " << pkt.speedN << "\n";
-//         std::cout << "longitude: " << pkt.longitude << "\n";
-//         std::cout << "latitude: " << pkt.latitude << "\n";
-//         std::cout << "altitude: " << pkt.altitude << "\n";
-
-//     }
-// };
-
-// VisualNavigator* VisualNavigator::visualNavigator_ = nullptr;
-
-// /**
-//  * Static methods should be defined outside the class.
-//  */
-// VisualNavigator *VisualNavigator::get_singleton()
-// {
-//     /**
-//      * This is a safer way to create an instance. instance = new VisualNavigator is
-//      * dangeruous in case two instance threads wants to access at the same time
-//      */
-//     if (visualNavigator_==nullptr) {
-//         visualNavigator_ = new VisualNavigator();
-//     }
-//     return visualNavigator_;
-// }
-
