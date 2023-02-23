@@ -29,7 +29,7 @@ def compare_images(new_img, mono, center_point, last_image, key_points_1, descri
 
         img_matches = np.empty((max(last_image.shape[0], new_img.shape[0]), last_image.shape[1] + new_img.shape[1], 3),
                                dtype=np.uint8)
-        compared_images = cv.drawMatches(last_image, key_points_1, new_img, key_points_2, good_matches[:3], img_matches,
+        compared_images = cv.drawMatches(last_image, key_points_1, new_img, key_points_2, good_matches[:6], img_matches,
                                          flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
 
         best_key_points_2 = [key_points_2[m.trainIdx]
