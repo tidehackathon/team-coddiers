@@ -4,6 +4,7 @@
 extract ISBH and ISBD messages from AP_Logging files and produce C++ arrays for consumption by the DSP subsystem
 '''
 from __future__ import print_function
+from pymavlink import mavutil
 
 import os
 import sys
@@ -19,7 +20,6 @@ parser.add_argument("logs", metavar="LOG", nargs="+")
 
 args = parser.parse_args()
 
-from pymavlink import mavutil
 
 def isb_parser(logfile):
     '''display fft for raw ACC data in logfile'''
@@ -113,9 +113,9 @@ def isb_parser(logfile):
         if isb_frame.sensor_type == 1 and isb_frame.instance == 0:  # gyro data
             print("    {")
 
-            for axis in [ "X","Y","Z" ]:
+            for axis in ["X", "Y", "Z"]:
                 # normalize data
-                d = numpy.array(isb_frame.data[axis]) # / float(isb_frame.multiplier)
+                d = numpy.array(isb_frame.data[axis])  # / float(isb_frame.multiplier)
                 print("        { " + ", ".join(d.astype(numpy.dtype(str))) + " },")
 
                 if len(d) == 0:
@@ -125,8 +125,7 @@ def isb_parser(logfile):
             print("    },")
 
     print("};")
-    print("const uint16_t SAMPLE_RATE = %d;" % sample_rate)    
-
+    print("const uint16_t SAMPLE_RATE = %d;" % sample_rate)
 
 
 for filename in args.logs:

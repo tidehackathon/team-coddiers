@@ -7,8 +7,11 @@ This assumes a csv file extracted from the datasheet using tablula:
  https://github.com/tabulapdf/tabula
 '''
 
-import sys, csv, os
+import sys
+import csv
+import os
 from functools import cmp_to_key
+
 
 def is_pin(str):
     '''see if a string is a valid pin name'''
@@ -26,15 +29,16 @@ def is_pin(str):
     except ValueError:
         return False
 
+
 def pin_compare(p1, p2):
     '''control pin sort order'''
-    (p1,f1) = p1.split(':')
-    (p2,f2) = p2.split(':')
+    (p1, f1) = p1.split(':')
+    (p2, f2) = p2.split(':')
     port1 = p1[:2]
     port2 = p2[:2]
     pin1 = int(p1[2:])
     pin2 = int(p2[2:])
-    #print(port1, pin1, port2, pin2)
+    # print(port1, pin1, port2, pin2)
     if port1 == port2:
         if pin1 == pin2:
             if f1 < f2:
@@ -47,8 +51,9 @@ def pin_compare(p1, p2):
         return -1
     return 1
 
+
 def parse_af_table(fname, table):
-    csvt = csv.reader(open(fname,'r'))
+    csvt = csv.reader(open(fname, 'r'))
     i = 0
     aflist = []
     for row in csvt:
@@ -78,6 +83,7 @@ def parse_af_table(fname, table):
             for f in functions:
                 table[pin+':'+f.upper()] = af
 
+
 table = {}
 
 if len(sys.argv) != 2:
@@ -86,10 +92,10 @@ if len(sys.argv) != 2:
 
 parse_af_table(sys.argv[1], table)
 
-sys.stdout.write("AltFunction_map = {\n");
+sys.stdout.write("AltFunction_map = {\n")
 sys.stdout.write('\t# format is PIN:FUNCTION : AFNUM\n')
 sys.stdout.write('\t# extracted from %s\n' % os.path.basename(sys.argv[1]))
 for k in sorted(table.keys(), key=cmp_to_key(pin_compare)):
     s = '"' + k + '"'
     sys.stdout.write('\t%-20s\t:\t%s,\n' % (s, table[k]))
-sys.stdout.write("}\n");
+sys.stdout.write("}\n")
