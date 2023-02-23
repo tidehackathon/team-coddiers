@@ -8,6 +8,7 @@ from scipy import stats
 from compareImages import compare_images
 import matplotlib.pyplot as plt
 
+from emNav.latLngToMeters import lat_lon_to_meters
 from vehicleData import get_heading, get_alt, get_lat, get_lon
 from rescaleFrame import rescale_frame
 from params import video_src, rescale_frame_percent
@@ -125,7 +126,8 @@ def video_reader(vehicle):
                 else:
                     if count == 6000:
                         factor = np.median(np.array(dist_lon_lat_tab)) / np.mean(np.array(dist_x_y_tab))
-                        factor_mean = np.mean(np.array(dist_lon_lat_tab)) / np.mean(np.array(dist_x_y_tab))
+                        factor_mean = stats.trim_mean(np.array(dist_lon_lat_tab), 0.2) / \
+                                      stats.trim_mean(np.array(dist_x_y_tab), 0.2)
                         factor_trim = stats.trim_mean(np.array(dist_lon_lat_tab), 0.2) / np.mean(np.array(dist_x_y_tab))
                         print(np.mean(np.array(dist_lon_lat_tab)))
                         print(np.mean(np.array(dist_x_y_tab[3:])))
@@ -140,15 +142,25 @@ def video_reader(vehicle):
                     current_y_trim = current_y_trim + dist_difference * factor_trim * sin(theta_rad)
                     current_z = get_alt(vehicle)
                     print('Heading: ', get_heading(vehicle))
-                    print('GPS: ', get_lon(vehicle) % 10 * 10, get_lat(vehicle) % 10 * 10, get_alt(vehicle))
-                    print('NO GPS: ', current_x, current_y, current_z)
-                    print('NO GPS mean: ', current_x_mean, current_y_mean, current_z)
-                    print('NO GPS trim: ', current_x_trim, current_y_trim, current_z)
-                    print('DIFF: ', get_lon(vehicle) % 10 * 10 - current_x, get_lat(vehicle) % 10 * 10 - current_y)
+                    print('GPS: ', get_lon(vehicle) % 10, get_lat(vehicle) % 10, get_alt(vehicle))
+                    print('NO GPS: ', current_x / 10, current_y / 10, current_z)
+                    print('NO GPS mean: ', current_x_mean / 10, current_y_mean / 10, current_z)
+                    print('NO GPS trim: ', current_x_trim / 10, current_y_trim / 10, current_z)
+                    print('DIFF: ',
+                          get_lon(vehicle) % 10 - current_x / 10, get_lat(vehicle) % 10 - current_y / 10)
+                    print('DIFF in meters: ',
+                          lat_lon_to_meters(get_lat(vehicle) % 10, get_lon(vehicle) % 10,
+                                            current_y / 10, current_x / 10), ' meters')
                     print('DIFF mean: ',
-                          get_lon(vehicle) % 10 * 10 - current_x_mean, get_lat(vehicle) % 10 * 10 - current_y_mean)
+                          get_lon(vehicle) % 10 - current_x_mean / 10, get_lat(vehicle) % 10 - current_y_mean / 10)
+                    print('DIFF mean in meters',
+                          lat_lon_to_meters(get_lat(vehicle) % 10, get_lon(vehicle) % 10,
+                                            current_y_mean / 10, current_x_mean / 10), ' meters')
                     print('DIFF trim: ',
-                          get_lon(vehicle) % 10 * 10 - current_x_trim, get_lat(vehicle) % 10 * 10 - current_y_trim)
+                          get_lon(vehicle) % 10 - current_x_trim / 10, get_lat(vehicle) % 10 - current_y_trim / 10)
+                    print('DIFF trim in meters',
+                          lat_lon_to_meters(get_lat(vehicle) % 10, get_lon(vehicle) % 10,
+                                            current_y_trim / 10, current_x_trim / 10), ' meters')
                     x_points.append(current_x)
                     y_points.append(current_y)
                     x_points_mean.append(current_x_mean)
