@@ -22,10 +22,10 @@ if not Path("AP_Declination.h").is_file():
     raise OSError("Please run this tool from the AP_Declination directory")
 
 
-def write_table(f,name, table):
+def write_table(f, name, table):
     '''write one table'''
     f.write("const float AP_Declination::%s[%u][%u] = {\n" %
-                (name, NUM_LAT, NUM_LON))
+            (name, NUM_LAT, NUM_LON))
     for i in range(NUM_LAT):
         f.write("    {")
         for j in range(NUM_LON):
@@ -37,6 +37,7 @@ def write_table(f,name, table):
             f.write(",")
         f.write("\n")
     f.write("};\n\n")
+
 
 date = datetime.datetime.now()
 
@@ -60,6 +61,7 @@ max_error = 0
 max_error_pos = None
 max_error_field = None
 
+
 def get_igrf(lat, lon):
     '''return field as [declination_deg, inclination_deg, intensity_gauss]'''
     mag = igrf.igrf(date, glat=lat, glon=lon, alt_km=0., isv=0, itype=1)
@@ -67,6 +69,7 @@ def get_igrf(lat, lon):
     inclination = float(mag.incl)
     declination = float(mag.decl)
     return [declination, inclination, intensity]
+
 
 def interpolate_table(table, latitude_deg, longitude_deg):
     '''interpolate inside a table for a given lat/lon in degrees'''
@@ -97,6 +100,8 @@ calculate magnetic field intensity and orientation, interpolating in tables
 
 returns array [declination_deg, inclination_deg, intensity] or None
 '''
+
+
 def interpolate_field(latitude_deg, longitude_deg):
     # limit to table bounds
     if latitude_deg < SAMPLING_MIN_LAT:
@@ -114,12 +119,14 @@ def interpolate_field(latitude_deg, longitude_deg):
 
     return [declination_deg, inclination_deg, intensity_gauss]
 
+
 def field_to_Vector3(mag):
     '''return mGauss field from dec, inc and intensity'''
     R = Matrix3()
     mag_ef = Vector3(mag[2]*1000.0, 0.0, 0.0)
     R.from_euler(0.0, -math.radians(mag[1]), math.radians(mag[0]))
     return R * mag_ef
+
 
 def test_error(lat, lon):
     '''check for error from lat,lon'''
@@ -135,6 +142,7 @@ def test_error(lat, lon):
         max_error_pos = (lat, lon)
         max_error_field = ef1 - ef2
 
+
 def test_max_error(lat, lon):
     '''check for maximum error from lat,lon over SAMPLING_RES range'''
     steps = 3
@@ -149,8 +157,9 @@ def test_max_error(lat, lon):
                 continue
             test_error(lat2, lon2)
 
-for i,lat in enumerate(lats):
-    for j,lon in enumerate(lons):
+
+for i, lat in enumerate(lats):
+    for j, lon in enumerate(lons):
         mag = get_igrf(lat, lon)
         declination_table[i][j] = mag[0]
         inclination_table[i][j] = mag[1]
@@ -171,20 +180,19 @@ const float AP_Declination::SAMPLING_MIN_LON = %u;
 const float AP_Declination::SAMPLING_MAX_LON = %u;
 
 ''' % (SAMPLING_RES,
-           SAMPLING_MIN_LAT,
-           SAMPLING_MAX_LAT,
-           SAMPLING_MIN_LON,
-           SAMPLING_MAX_LON))
+       SAMPLING_MIN_LAT,
+       SAMPLING_MAX_LAT,
+       SAMPLING_MIN_LON,
+       SAMPLING_MAX_LON))
 
-
-    write_table(f,'declination_table', declination_table)
-    write_table(f,'inclination_table', inclination_table)
-    write_table(f,'intensity_table', intensity_table)
+    write_table(f, 'declination_table', declination_table)
+    write_table(f, 'inclination_table', inclination_table)
+    write_table(f, 'intensity_table', intensity_table)
 
 if args.check_error:
     print("Checking for maximum error")
-    for lat in range(-60,60,1):
-        for lon in range(-180,180,1):
+    for lat in range(-60, 60, 1):
+        for lon in range(-180, 180, 1):
             test_max_error(lat, lon)
     print("Generated with max error %.2f %s at (%.2f,%.2f)" % (
         max_error, max_error_field, max_error_pos[0], max_error_pos[1]))
