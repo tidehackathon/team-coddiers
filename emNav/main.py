@@ -48,28 +48,36 @@ compas_angle = 0
 
 compared_images = None
 
+vehicle_lon = 0
+vehicle_lat = 0
+vehicle_alt = 0
+vehicle_heading = 0
+
 
 def single_step_calculation(frame):
     global factor, factor_mean, factor_trim, compared_images, gps_x_points, gps_y_points, z_points, no_gps_x_points, \
         no_gps_y_points, no_gps_mean_x_points, no_gps_mean_y_points, no_gps_trim_x_points, no_gps_trim_y_points, \
         last_lat, last_lon, current_x_mean, current_y_mean, current_x_trim, current_y_trim, best_key_points_1, count, \
-        current_x, current_y, descriptors_1, dist_lon_lat_tab, dist_x_y_tab, key_points_1, last_image, vehicle
+        current_x, current_y, descriptors_1, dist_lon_lat_tab, dist_x_y_tab, key_points_1, last_image, vehicle_lon, \
+        vehicle_lat, vehicle_alt, vehicle_heading
 
     center_width = int(frame.shape[1] / 2)
     center_height = int(frame.shape[0] / 2)
     center_point = (center_width, center_height)
 
+    print(vehicle_lon, vehicle_lat, vehicle_alt, vehicle_heading, '--------------------------------------------')
+
     factor, factor_mean, factor_trim, new_img, key_points_2, descriptors_2, best_key_points_2, compared_images, \
     gps_x_points, gps_y_points, z_points, no_gps_x_points, no_gps_y_points, no_gps_mean_x_points, \
     no_gps_mean_y_points, no_gps_trim_x_points, no_gps_trim_y_points, last_lat, last_lon, current_x, current_y, \
     current_x_mean, current_y_mean, current_x_trim, current_y_trim = \
-        single_step_controller(vehicle, count, frame, last_image, factor, factor_mean, factor_trim,
-                               center_point, key_points_1, descriptors_1, best_key_points_1, z_points,
-                               last_lat, last_lon, gps_x_points, gps_y_points, no_gps_x_points,
+        single_step_controller(vehicle_lon, vehicle_lat, vehicle_alt, vehicle_heading,
+                               count, frame, last_image, factor,
+                               factor_mean, factor_trim, center_point, key_points_1, descriptors_1, best_key_points_1,
+                               z_points, last_lat, last_lon, gps_x_points, gps_y_points, no_gps_x_points,
                                no_gps_y_points, no_gps_mean_x_points, no_gps_mean_y_points,
                                no_gps_trim_x_points, no_gps_trim_y_points, dist_lon_lat_tab, dist_x_y_tab,
-                               current_x, current_y, current_x_mean,
-                               current_y_mean, current_x_trim, current_y_trim)
+                               current_x, current_y, current_x_mean, current_y_mean, current_x_trim, current_y_trim)
 
     last_image = new_img
     key_points_1 = key_points_2
@@ -96,7 +104,7 @@ def get_frame():
 def handle_message(self, name, message):
     global best_key_points_1, descriptors_1, key_points_1, last_image, compared_images
     print(message)
-    if str(message).find('Reached waypoint #3') != -1:
+    if str(message).find('Reached waypoint #3'):
         while True:
             frame = next(gen)
             t1 = Thread(target=single_step_calculation, args=[frame])
