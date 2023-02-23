@@ -49,14 +49,14 @@ def compare_images(new_img, mono, center_point, last_image, key_points_1, descri
                             center_point, best_key_points_1[i].pt)
                         dist_two = math.dist(
                             center_point, best_key_points_2[i].pt)
-                        dist_difference += dist_one - dist_two
+                        dist_difference += math.fabs(dist_one - dist_two)
                 else:
                     for i in range(len(best_key_points_1)):
                         dist_one = math.dist(
                             center_point, best_key_points_1[i].pt)
                         dist_two = math.dist(
                             center_point, best_key_points_2[i].pt)
-                        dist_difference += dist_one - dist_two
+                        dist_difference += math.fabs(dist_one - dist_two)
 
             dist_difference = dist_difference / dist_calc_accuracy
             return compared_images, dist_difference, new_img, key_points_2, descriptors_2, best_key_points_2

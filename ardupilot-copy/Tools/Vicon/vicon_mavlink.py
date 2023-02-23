@@ -66,7 +66,7 @@ def connect_to_vicon(ip):
     # wait for first subject to appear
     print("waiting for vehicle...")
     while True:
-        vicon.get_frame()
+        vicon.video_reader_by_frames()
         name = vicon.get_subject_name(0)
         if name is not None:
             break
@@ -104,7 +104,7 @@ def main_loop():
         if args.send_zero:
             time.sleep(0.05)
         else:
-            vicon.get_frame()
+            vicon.video_reader_by_frames()
 
         now = time.time()
         now_ms = int(now * 1000)
