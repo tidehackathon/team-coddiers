@@ -20,7 +20,7 @@ count = 0
 def handle_message(self, name, message):
     global check, count
     print(message)
-    if str(message).find('Reached waypoint #3') != -1:
+    if str(message).find('Reached waypoint #3'):
         check = True
         count = 0
         return True
@@ -185,9 +185,10 @@ def video_reader(vehicle):
             key_points_1 = key_points_2
             descriptors_1 = descriptors_2
             best_key_points_1 = best_key_points_2
-            end = time.time()
-            if end - start < 0.5:
-                time.sleep(0.5 - (end - start))
+            while time.time() - start < 0.95:
+                pass
         count += 1
+
+    plt.show(block=True)
     vic_cap.release()
     cv2.destroyAllWindows()
