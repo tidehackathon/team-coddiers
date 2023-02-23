@@ -20,9 +20,8 @@ count = 0
 def handle_message(self, name, message):
     global check, count
     print(message)
-    if str(message).find('Reached waypoint #3'):
+    if str(message).find('Reached waypoint #3') != -1:
         check = True
-        count = 0
         return True
 
 
@@ -99,7 +98,7 @@ def video_reader(vehicle):
                 compare_images(image, True, center_point, last_image,
                                key_points_1, descriptors_1, best_key_points_1)
             if compared_images is not None and dist_difference is not None and best_key_points_2 is not None:
-                if count < 6000:
+                if count < 3000:
                     print('Step: ', count)
                     current_x = get_lon(vehicle) % 10 * 10
                     current_y = get_lat(vehicle) % 10 * 10
@@ -124,7 +123,7 @@ def video_reader(vehicle):
                     last_lon = current_x
                     last_lat = current_y
                 else:
-                    if count == 6000:
+                    if count == 3000:
                         factor = np.median(np.array(dist_lon_lat_tab)) / np.mean(np.array(dist_x_y_tab))
                         factor_mean = stats.trim_mean(np.array(dist_lon_lat_tab), 0.2) / \
                                       stats.trim_mean(np.array(dist_x_y_tab), 0.2)
