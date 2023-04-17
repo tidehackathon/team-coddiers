@@ -1,4 +1,6 @@
 import math
+import time
+
 import cv2 as cv
 import numpy as np
 from params import flann_index_kdtree, search_params_checks, flann_index_trees, dist_calc_accuracy
@@ -14,17 +16,34 @@ def get_distance(item):
 
 
 def compare_images(new_img, mono, center_point, last_image, key_points_1, descriptors_1, best_key_points_1):
+
     if mono:
         new_img = cv.cvtColor(new_img, cv.COLOR_BGR2GRAY)
-
+    start = time.time()
     key_points_2, descriptors_2 = sift.detectAndCompute(new_img, None)
+    print('SIFT time: ', time.time() - start)
+    if descriptors_2 is None:
+        return None, None, new_img, key_points_2, descriptors_2, None
 
     if descriptors_1 is not None:
-        matches = flann.knnMatch(descriptors_1, descriptors_2, k=2)
+        if len(key_points_1) >= 2 and len(key_points_2) >= 2:
+            start = time.time()
+            matches = flann.knnMatch(descriptors_1, descriptors_2, k=2)
+            print('KNN time: ', time.time() - start)
+        else:
+            if len(key_points_1) == 1 and len(key_points_2) == 1:
+                start = time.time()
+                matches = flann.knnMatch(descriptors_1, descriptors_2, k=1)
+                print('KNN time: ', time.time() - start)
+            else:
+                return None, None, new_img, key_points_2, descriptors_2, None
         good_matches = []
-        for m, n in matches:
-            if m.distance < 0.7 * n.distance:
-                good_matches.append(m)
+        if len(matches) >= 2:
+            for m, n in matches:
+                if m.distance < 0.7 * n.distance:
+                    good_matches.append(m)
+        else:
+            return None, None, new_img, key_points_2, descriptors_2, None
         good_matches = sorted(good_matches, key=lambda x: x.distance)
 
         img_matches = np.empty((max(last_image.shape[0], new_img.shape[0]), last_image.shape[1] + new_img.shape[1], 3),
