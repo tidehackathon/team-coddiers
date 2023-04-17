@@ -11,14 +11,14 @@
 ### Requirements:
 - [Mission Planer](https://ardupilot.org/planner/docs/mission-planner-installation.html) / We suggest disabling Altitude Angel login during installation
 - Virtual Machine with [ArduPilot](https://ardupilot.org/dev/docs/building-setup-linux.html?fbclid=IwAR03JKKK8-jABCSgNqTpenUjjdYro7u2j_tUFHjnqu7RoCnN3Oc8vvZVVgc#building-setup-linux) installed and the drone's starting location configured
-- The following program code ;)
-- Wi-Fi network to connect all the above components together. (We can run everything on one computer, the important thing is to have a connection to some network for ArduPilot to connect to it and then copy the IP address of the virtual machine on which we are running ArduPilot)
+- Our application ;)
+- Network to connect all the above components together eg. wifi connection with IP4 address of virtual machine on which ArduPilot is on for connecting from other apps.
 
 ### List of steps
-1. Fully run ArduPilot
+1. Launch and run ArduPilot
 2. Launch and set up the Mission Planner, but do not launch the mission
-3. Run the operation of our code
-4. Run the mission
+3. Run the our application
+4. Run mission in the Mission Planner 
 
 ## ArduPilot Component
 ### How to add a drone's starting location in ArduPilot:
