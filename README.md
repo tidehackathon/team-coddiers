@@ -10,7 +10,7 @@
 # Installation
 ### Requirements:
 - [Mission Planer](https://ardupilot.org/planner/docs/mission-planner-installation.html) / We suggest disabling Altitude Angel login during installation
-- Virtual Machine with [ArduPilot](https://ardupilot.org/dev/docs/building-setup-linux.html?fbclid=IwAR03JKKK8-jABCSgNqTpenUjjdYro7u2j_tUFHjnqu7RoCnN3Oc8vvZVVgc#building-setup-linux) installed and the drone's starting location configured
+- Virtual Machine with [ArduPilot](https://ardupilot.org/dev/docs/building-setup-linux.html?fbclid=IwAR03JKKK8-jABCSgNqTpenUjjdYro7u2j_tUFHjnqu7RoCnN3Oc8vvZVVgc#building-setup-linux) installed and the drone's starting location configured (Password for our emNav virtual machine with Ardupilot: changeme)
 - Our application ;)
 - Network to connect all the above components together eg. wifi connection with IP4 address of virtual machine on which ArduPilot is on for connecting from other apps.
 
